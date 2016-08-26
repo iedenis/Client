@@ -51,11 +51,13 @@ public class Client extends Thread {
 				PrintStream printStream = null;
 				try {
 					printStream = new PrintStream(socket.getOutputStream());
+					
+					printStream.println(ClientGUI.getUsernameInput()+ " is connected to chat");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				// message=
-				printStream.println("hello to server");
+				//printStream.println(ClientGUI.getUsernameInput()+ " is connected to chat");
 
 			}
 			disconnect();
