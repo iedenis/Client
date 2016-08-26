@@ -46,7 +46,7 @@ public class Click implements ActionListener {
 			_button.setText("Connect");
 		}
 		if(e.getActionCommand()=="Send"){
-			
+			client.sendMessage();
 		}
 	}
 
