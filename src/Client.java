@@ -24,7 +24,8 @@ public class Client extends Thread {
 	public void run() {
 		counter = 0;
 
-		System.out.println("Started thread with client" + Thread.currentThread().getName());
+		// System.out.println("Started thread with client" +
+		// Thread.currentThread().getName());
 		while (socket == null && counter < 10 && running) {
 			counter++;
 			System.out.println("Trying to connect to server...");
@@ -62,12 +63,7 @@ public class Client extends Thread {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			// message=
-			// printStream.println(ClientGUI.getUsernameInput()+ " is
-			// connected to chat");
-
 		}
-		// disconnect();
 	}
 
 	private void checkStream() {
@@ -78,13 +74,20 @@ public class Client extends Thread {
 	private void receive() {
 
 		if (input.hasNext()) {
-			String Mmessage = input.nextLine();
-			ClientGUI.chatArea.append(Mmessage);
+			String message = input.nextLine();
+			if (message.contains("@clients:")) {
+				String tmp = message.substring(10);
+				String onlineUsers[] = tmp.split(",");
+				ClientGUI.setOnlineUsers(onlineUsers);
+			} else {
+				message = input.nextLine();
+				ClientGUI.chatArea.append(message + "\n");
+			}
 		}
 	}
 
 	public static void sendMessage() {
-		String message;
+
 		if (socket != null) {
 			if (!ClientGUI.getInputMessage().equals("")) {
 				try {
@@ -94,11 +97,11 @@ public class Client extends Thread {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				
-				ClientGUI.chatArea.append(ClientGUI.getUsername()+" : " + ClientGUI.getInputMessage());
+
+				ClientGUI.chatArea.append(ClientGUI.getUsername() + " : " + ClientGUI.getInputMessage());
 				ClientGUI.setInputMessage("");
 				output.flush();
-				//output.close();
+				// output.close();
 
 			} else
 				JOptionPane.showMessageDialog(null, "Please write a message");
@@ -114,11 +117,12 @@ public class Client extends Thread {
 	}
 
 	public static void disconnect() {
+		System.out.println("Disconnecting..");
+		ClientGUI.setOnlineUsers(new String[]{""});
 		try {
 			if (socket != null) {
 				socket.close();
 				System.out.println("Disconnected successfully");
-				// running = false;
 			} else {
 				System.out.println("There is no socket");
 				// running = false;

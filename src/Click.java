@@ -1,5 +1,6 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -17,6 +18,7 @@ public class Click implements ActionListener {
 		this._item = item;
 	}
 
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
