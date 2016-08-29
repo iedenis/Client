@@ -1,8 +1,4 @@
-import java.awt.EventQueue;
-import java.net.Socket;
-
 import javax.swing.JFrame;
-import java.awt.BorderLayout;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.GroupLayout;
@@ -12,8 +8,6 @@ import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JTextField;
 import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 
 public class ClientGUI {
@@ -24,6 +18,7 @@ public class ClientGUI {
 	protected JTextField port_field;
 	private static JTextField inputMessage;
 	protected JButton btnConnect;
+	protected JButton btnSend;
 	protected JMenuItem mntmExit;
 	protected static JTextArea chatArea;
 	public ClientGUI() {
@@ -53,7 +48,7 @@ public class ClientGUI {
 		port_field.setColumns(10);
 		port_field.setText("15500");
 		
-		JButton btnSend = new JButton("Send");
+		btnSend = new JButton("Send");
 		btnSend.addActionListener(new Click(btnSend, null));
 		
 		
@@ -151,7 +146,7 @@ public class ClientGUI {
 		
 		mnFile.add(mntmExit);
 	}
-	public static String getUsernameInput(){
+	public static String getUsername(){
 		return userNameInput.getText();
 	}
 	public void setUsernameInput(String nickName){
