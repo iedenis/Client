@@ -49,7 +49,7 @@ public class Protocol {
 			// res[1] the answer from server "success"/"fail"
 			// res[2] the message from server (like try to choose another username)
 			String[] st = message.split(":", 2);
-			res[0] = st[0];
+			res[0] = st[0].substring(1);
 			res[1] = st[1];
 			return res;
 
@@ -65,20 +65,21 @@ public class Protocol {
 			return res;
 		}
 	}
-/*
+
 	public static void main(String[] args) {
+		String connectingMessage="2denis:success";
 		String message = "1@denis:@alexey:whats up?";
 		String messageB = "0@denis:hello to all";
 		String messageServer = "5user is offline";
 		String str[] = parseMessage(messageB);
 		String message1 = "@alexey:Hello";
 
-		String str2[] = parseMessage(messageB);
+		String str2[] = parseMessage(connectingMessage);
+		System.out.println("connected? "+str2[1]);
 		for (int i = 0; i < str2.length; i++) {
 			System.out.println(str2[i]);
 		}
-
 	}
-	*/
+	
 
 }

@@ -18,7 +18,7 @@ public class ClientGUI {
 	protected JFrame frame;
 	protected static JTextField insertServerIP;
 	private static JTextField userNameInput;
-	protected JTextField port_field;
+	protected static JTextField port_field;
 	private static JTextField inputMessage;
 	protected JButton btnConnect;
 	protected JButton btnSend;
@@ -149,6 +149,12 @@ public class ClientGUI {
 		mnFile.add(mntmExit);
 	}
 
+	public static void setPort(String port){
+		port_field.setText(port);
+	}
+	public static String getPort(){
+		return port_field.getText();
+	}
 	public static String getUsername() {
 		return userNameInput.getText();
 	}
