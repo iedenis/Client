@@ -18,9 +18,6 @@ public class Protocol {
 		ParsedMessage[1] = answer;
 	}
 
-	// res[0] message
-	// res[1] client name
-
 	public static String[] parseMessage(String message) {
 		int messageType = getType(message);
 		String[] res = new String[3];
@@ -30,7 +27,7 @@ public class Protocol {
 			// res[1] -> from
 			String str[] = message.split(":", 2);
 			res[0] = str[1];
-			res[1] = str[0].substring(1);
+			res[1] = str[0].substring(2);
 			return res;
 		case privateMessage:
 			// res[0] -> message
@@ -56,8 +53,10 @@ public class Protocol {
 			res[1] = st[1];
 			return res;
 
+		// nothing need to do. The client receive the disconnecting message and
+		// disconnecting from chat
 		case disconnectMessage:
-			// return in res[0] the answer
+			return res;
 		case serverMessage:
 			res[0] = message.substring(1);
 			return res;
@@ -66,31 +65,20 @@ public class Protocol {
 			return res;
 		}
 	}
-	
-	//parsing client message
-	public static void parseUserMessage(String message){
-		
-	}
-	/*
+/*
 	public static void main(String[] args) {
 		String message = "1@denis:@alexey:whats up?";
-		String messageB = "0denis:hello to all";
+		String messageB = "0@denis:hello to all";
 		String messageServer = "5user is offline";
 		String str[] = parseMessage(messageB);
-		String message1="@alexey:Hello";
-		
-		char firstChar = message1.charAt(0);
-		String[] str1 = message1.split(":", 2);
-		String to = str1[0] + ":";
-		String newMessage="";
-		if (firstChar == '@') {
-			newMessage=Protocol.createMessage(1, "@denis:", message1);
-		}
-		String str2[]=parseMessage(newMessage);
+		String message1 = "@alexey:Hello";
+
+		String str2[] = parseMessage(messageB);
 		for (int i = 0; i < str2.length; i++) {
 			System.out.println(str2[i]);
 		}
-		
+
 	}
 	*/
+
 }

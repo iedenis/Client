@@ -104,6 +104,8 @@ public class Client extends Thread {
 		// server message
 		case 5:
 			JOptionPane.showMessageDialog(null, result[0]);
+		case 3:
+			disconnect();
 		}
 	}
 
