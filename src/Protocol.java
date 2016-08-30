@@ -71,6 +71,7 @@ public class Protocol {
 	public static void parseUserMessage(String message){
 		
 	}
+	/*
 	public static void main(String[] args) {
 		String message = "1@denis:@alexey:whats up?";
 		String messageB = "0denis:hello to all";
@@ -91,4 +92,5 @@ public class Protocol {
 		}
 		
 	}
+	*/
 }
