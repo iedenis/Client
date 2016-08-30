@@ -32,7 +32,7 @@ public class ClientGUI {
 
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(200, 200, 500, 350);
+		frame.setBounds(200, 200, 500, 400);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("Client");
 		JLabel lblNewLabel = new JLabel("Server IP");
@@ -50,7 +50,7 @@ public class ClientGUI {
 
 		port_field = new JTextField();
 		port_field.setColumns(10);
-		port_field.setText("15500");
+		port_field.setText("55555");
 
 		btnSend = new JButton("Send");
 		btnSend.addActionListener(new Click(btnSend, null));

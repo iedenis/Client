@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.*;
 import java.util.Scanner;
 
+import javax.print.attribute.standard.PrinterInfo;
 import javax.swing.JOptionPane;
 
 public class Client implements Runnable {
@@ -16,7 +17,7 @@ public class Client implements Runnable {
 	Scanner input;
 	static PrintStream output;
 	private static int counter;
-	//private PrintWriter writer;
+	// private PrintWriter writer;
 
 	public Client(int port) {
 		this._port = port;
@@ -24,7 +25,7 @@ public class Client implements Runnable {
 	}
 
 	public void run() {
-		while (socket == null && counter < 10) {
+		while (running && socket == null && counter < 10) {
 			counter++;
 			System.out.println("Trying to connect to server..." + " time " + counter);
 
@@ -50,30 +51,37 @@ public class Client implements Runnable {
 					running = false;
 				}
 			}
-
 		}
 		if (socket != null) {
 			System.out.println("Accepted socket from server");
-			
-			try {
-				String connectRequestMessage = "2" + ClientGUI.getUsername() + ":";
 
+			try {
+				int times = 5;
+				String servMessage = "";
+				String connectRequestMessage = "2" + ClientGUI.getUsername() + ":";
+				String[] res;
 				// sending request connection message to server
-				printStream = new PrintStream(socket.getOutputStream());
-				// printStream.println(connectRequestMessage);
-				printStream.println(connectRequestMessage);
-				printStream.flush();
-				input = new Scanner(socket.getInputStream());
-				String servMessage = input.nextLine();
-				String[] res = new String[3];
-				res = Protocol.parseMessage(servMessage);
+
+				do {
+					if (times == 0)
+						disconnect();
+					printStream = new PrintStream(socket.getOutputStream());
+					// printStream.println(connectRequestMessage);
+					printStream.println(connectRequestMessage);
+					printStream.flush();
+					input = new Scanner(socket.getInputStream());
+					servMessage = input.nextLine();
+					res = new String[3];
+					res = Protocol.parseMessage(servMessage);
+					// if the respond message from server
+					times--;
+				} while (times > 0 && !res[1].equals("success"));
+
 				if (Protocol.getType(servMessage) == 2 && res[1].equals("success")) {
 					ClientGUI.chatArea.append("You are connected to chat");
-					// printStream = new PrintStream(socket.getOutputStream());
-					// printStream.println(ClientGUI.getUsername() + " is
-					// connected to chat\n");
-					// printStream.flush();
+					// check for input messages
 					checkStream();
+
 				} else if (res[2] == null || res[2] == "") {
 					System.out.println("haven't receive the answer from server");
 				} else
@@ -102,24 +110,25 @@ public class Client implements Runnable {
 		String[] result = Protocol.parseMessage(msg);
 		switch (Protocol.getType(msg)) {
 		// private message from result[2]
-		case 0:
+		case Protocol.broadcastMessage:
 			ClientGUI.chatArea.append("[public] " + result[1] + ": " + result[0] + "\n");
 			break;
 		// broadcast message
-		case 1:
+		case Protocol.privateMessage:
 			ClientGUI.chatArea.append("[private] " + result[2] + ": " + result[0] + "\n");
 			break;
-		case 4:
+		case Protocol.refreshOnlineUsers:
 			String[] users = result[0].split(",");
 			for (int j = 0; j < users.length; j++) {
 				ClientGUI.onlineUsers.append(users[j] + "\n");
 			}
 			break;
 		// server message
-		case 5:
+		case Protocol.serverMessage:
 			JOptionPane.showMessageDialog(null, result[0]);
-		case 3:
+		case Protocol.disconnectMessage:
 			disconnect();
+			break;
 		}
 	}
 
@@ -137,7 +146,6 @@ public class Client implements Runnable {
 					} else {
 						newMessage = Protocol.createMessage(0, from, message);
 					}
-
 					output = new PrintStream(socket.getOutputStream());
 					output.println(newMessage);
 					output.flush();
@@ -164,15 +172,24 @@ public class Client implements Runnable {
 	}
 
 	public static void disconnect() {
+		running = false;
+		try {
+			printStream = new PrintStream(socket.getOutputStream());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		printStream.println(Protocol.createMessage(Protocol.disconnectMessage, "", ""));
+		printStream.flush();
+		printStream.close();
+		
 		System.out.println("Disconnecting..");
 		ClientGUI.setOnlineUsers(new String[] { "" });
 		try {
 			if (socket != null) {
 				socket.close();
-				System.out.println("Disconnected successfully");
+				System.out.println("Disconnected successfully from chat");
 			} else {
 				System.out.println("There is no socket");
-				// running = false;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

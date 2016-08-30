@@ -1,9 +1,9 @@
 
 public class Protocol {
 
-	private static final int broadcastMessage = 0, privateMessage = 1, connectRequestMessage = 2, disconnectMessage = 3,
+	public static final int broadcastMessage = 0, privateMessage = 1, connectRequestMessage = 2, disconnectMessage = 3,
 			refreshOnlineUsers = 4, serverMessage = 5;
-
+	
 	public static int getType(String message) {
 		return Character.getNumericValue(message.charAt(0));
 	}
@@ -56,6 +56,7 @@ public class Protocol {
 		// nothing need to do. The client receive the disconnecting message and
 		// disconnecting from chat
 		case disconnectMessage:
+			//res[0]=message.substring(1);
 			return res;
 		case serverMessage:
 			res[0] = message.substring(1);
@@ -66,6 +67,7 @@ public class Protocol {
 		}
 	}
 
+/*
 	public static void main(String[] args) {
 		String connectingMessage="2denis:success";
 		String message = "1@denis:@alexey:whats up?";
@@ -74,12 +76,15 @@ public class Protocol {
 		String str[] = parseMessage(messageB);
 		String message1 = "@alexey:Hello";
 
-		String str2[] = parseMessage(connectingMessage);
-		System.out.println("connected? "+str2[1]);
+		parseMessage(connectingMessage);
+		String servmessage=Protocol.createMessage(5, "","Hello");
+		String connectionRequest= Protocol.createMessage(connectRequestMessage, "denis", "success");
+		String disconnectMessage="3denis:";
+		String str2[] = Protocol.parseMessage(connectingMessage);
+		//System.out.println("message from server is: "+str2[0]);
 		for (int i = 0; i < str2.length; i++) {
 			System.out.println(str2[i]);
 		}
 	}
-	
-
+	*/
 }
