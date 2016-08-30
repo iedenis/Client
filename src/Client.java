@@ -9,7 +9,7 @@ import javax.swing.JOptionPane;
 public class Client extends Thread {
 	int _port;
 	static Socket socket;
-	protected static String message;
+	public static String message;
 	private static boolean running = true;
 	private static PrintStream printStream = null;
 	Scanner input;
@@ -22,22 +22,19 @@ public class Client extends Thread {
 	}
 
 	public void run() {
-		counter = 0;
+		while (socket == null && counter < 10) {
 
-		// System.out.println("Started thread with client" +
-		// Thread.currentThread().getName());
-		while (socket == null && counter < 10 && running) {
-			counter++;
 			System.out.println("Trying to connect to server...");
 			try {
 				socket = new Socket(ClientGUI.getServerIP(), 15500);
 				System.out.println("Client socket is: " + socket);
+
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
 				try {
 					Thread.sleep(5000);
 					System.out.println("Waiting for server...");
-
+					counter++;
 				} catch (InterruptedException e1) {
 					e1.printStackTrace();
 				}
@@ -45,8 +42,9 @@ public class Client extends Thread {
 				e.printStackTrace();
 				try {
 					Thread.sleep(5000);
-					ClientGUI.chatArea.append("Still waiting for server");
+					ClientGUI.chatArea.append("Still waiting for server\n");
 				} catch (InterruptedException e1) {
+					e1.printStackTrace();
 					running = false;
 				}
 			}
@@ -56,10 +54,17 @@ public class Client extends Thread {
 			System.out.println("Accepted socket from server");
 			try {
 				input = new Scanner(socket.getInputStream());
-				printStream = new PrintStream(socket.getOutputStream());
-				printStream.println(ClientGUI.getUsername() + " is connected to chat\n");
-				printStream.flush();
-				checkStream();
+				String servMessage = input.nextLine();
+				String[] res = Protocol.parseMessage(servMessage);
+				if (Protocol.getType(servMessage) == 2 && res[1].equals("success")) {
+					ClientGUI.chatArea.append("You are connected to chat");
+					//printStream = new PrintStream(socket.getOutputStream());
+					//printStream.println(ClientGUI.getUsername() + " is connected to chat\n");
+					//printStream.flush();
+					checkStream();
+				} else
+					JOptionPane.showMessageDialog(null, res[3]);
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -75,14 +80,30 @@ public class Client extends Thread {
 
 		if (input.hasNext()) {
 			String message = input.nextLine();
-			if (message.contains("@clients:")) {
-				String tmp = message.substring(10);
-				String onlineUsers[] = tmp.split(",");
-				ClientGUI.setOnlineUsers(onlineUsers);
-			} else {
-				message = input.nextLine();
-				ClientGUI.chatArea.append(message + "\n");
+			processMessage(message);
+		}
+	}
+
+	private void processMessage(String msg) {
+		String[] result = Protocol.parseMessage(msg);
+		switch (Protocol.getType(msg)) {
+		// private message from result[2]
+		case 0:
+			ClientGUI.chatArea.append("[public] " + result[1] + ": " + result[0] + "\n");
+			break;
+		// broadcast message
+		case 1:
+			ClientGUI.chatArea.append("[private] " + result[2] + ": " + result[0] + "\n");
+			break;
+		case 4:
+			String[] users = result[0].split(",");
+			for (int j = 0; j < users.length; j++) {
+				ClientGUI.onlineUsers.append(users[j] + "\n");
 			}
+			break;
+		// server message
+		case 5:
+			JOptionPane.showMessageDialog(null, result[0]);
 		}
 	}
 
@@ -91,10 +112,20 @@ public class Client extends Thread {
 		if (socket != null) {
 			if (!ClientGUI.getInputMessage().equals("")) {
 				try {
-					output = new PrintStream(socket.getOutputStream());
-					output.println(ClientGUI.getInputMessage());
+					message = ClientGUI.getInputMessage();
+					char firstChar = message.charAt(0);
+					String from = "@" + ClientGUI.getUsername() + ":";
+					String newMessage = "";
+					if (firstChar == '@') {
+						newMessage = Protocol.createMessage(1, from, message);
+					}
+					else{
+						newMessage= Protocol.createMessage(0, from, message);
+					}
 
-				} catch (IOException e) {
+					output = new PrintStream(socket.getOutputStream());
+					output.println(newMessage);
+									} catch (IOException e) {
 					e.printStackTrace();
 				}
 
@@ -104,7 +135,7 @@ public class Client extends Thread {
 				// output.close();
 
 			} else
-				JOptionPane.showMessageDialog(null, "Please write a message");
+				JOptionPane.showMessageDialog(null, "Please, write a message");
 		} else
 			JOptionPane.showMessageDialog(null, "You are disconnected");
 		// ClientGUI.chatArea.append("You are disconnected");
@@ -118,7 +149,7 @@ public class Client extends Thread {
 
 	public static void disconnect() {
 		System.out.println("Disconnecting..");
-		ClientGUI.setOnlineUsers(new String[]{""});
+		ClientGUI.setOnlineUsers(new String[] { "" });
 		try {
 			if (socket != null) {
 				socket.close();
