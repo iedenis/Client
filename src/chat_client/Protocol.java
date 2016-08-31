@@ -1,23 +1,65 @@
-
+package chat_client;
+/**
+ * @author Denis Ievlev
+ * @author Alexey Kurbatsky
+ */
+ /**
+ * The class is represents a protocol for the messages that 
+ * server and client send and receive.<br>
+ * Also it parses a receiving messages and creats messages to send<br>
+ * All methods of this class are static
+ */
 public class Protocol {
 
 	public static final int broadcastMessage = 0, privateMessage = 1, connectRequestMessage = 2, disconnectMessage = 3,
 			refreshOnlineUsers = 4, serverMessage = 5;
 	
+	/**
+	 * Returns a type of the message:<br>
+	 * 
+	 * @param message is a String message that created by {@link #createMessage(int, String, String)}
+	 * @return type such as:<br>
+	 * broadcastMessage<br>
+	 * privateMessage <br>
+	 * connectRequestMessage<br>
+	 * disconnectMessage<br>
+	 * refreshOnlineUsers<br>
+	 * serverMessage
+	 */
 	public static int getType(String message) {
 		return Character.getNumericValue(message.charAt(0));
 	}
 
+	/**
+	 * Creates a new message to send either to the server or to client.
+	 * @param type the tyep of the sending message.
+	 * @param from from whom sent the message (username).
+	 * @param message the sending message.
+	 * @return message with header
+	 */
 	public static String createMessage(int type, String from, String message) {
-		return type + from + message;
+		return type + from+":" + message;
 	}
 
 	// result from connection request
 	// answer = "success"/"fail"
+	/**
+	 * Setting the result message from "connectRequest" message.<br>
+	 * The answer can be success when the connection established successfully<br>
+	 * or fail when the requested username is in use by other user.
+	 * @param ParsedMessage
+	 * @param answer The answer from the server
+	 */
+	
 	public static void setResultFromServer(String[] ParsedMessage, String answer) {
 		ParsedMessage[1] = answer;
 	}
 
+	/**
+	 * Method parses the received message either from client or server.
+	 * @param message is the coded message by {{@link #createMessage(int, String, String)}
+	 * @return returns an array of answers.
+	 */
 	public static String[] parseMessage(String message) {
 		int messageType = getType(message);
 		String[] res = new String[3];
@@ -41,7 +83,7 @@ public class Protocol {
 
 		// all users separated by comma (,) in one String
 		case refreshOnlineUsers:
-			res[0] = message.substring(1);
+			res[0] = message.substring(2);
 			return res;
 
 		case connectRequestMessage:
@@ -66,25 +108,4 @@ public class Protocol {
 			return res;
 		}
 	}
-
-/*
-	public static void main(String[] args) {
-		String connectingMessage="2denis:success";
-		String message = "1@denis:@alexey:whats up?";
-		String messageB = "0@denis:hello to all";
-		String messageServer = "5user is offline";
-		String str[] = parseMessage(messageB);
-		String message1 = "@alexey:Hello";
-
-		parseMessage(connectingMessage);
-		String servmessage=Protocol.createMessage(5, "","Hello");
-		String connectionRequest= Protocol.createMessage(connectRequestMessage, "denis", "success");
-		String disconnectMessage="3denis:";
-		String str2[] = Protocol.parseMessage(connectingMessage);
-		//System.out.println("message from server is: "+str2[0]);
-		for (int i = 0; i < str2.length; i++) {
-			System.out.println(str2[i]);
-		}
-	}
-	*/
 }

@@ -1,6 +1,7 @@
+
+package chat_client;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -12,7 +13,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+/**
+ * @author Denis Ievlev
+ * @author Alexey Kurbatsky
+ */
 
+/**
+ * The class represents a GUI for a client.<br>
+ * This is only GUI items.
+ */
 public class ClientGUI {
 
 	protected JFrame frame;
@@ -149,37 +158,81 @@ public class ClientGUI {
 		mnFile.add(mntmExit);
 	}
 
+	/** 
+	 * Sets a new port that when we want to change
+	 * @param port a new port
+	 */
 	public static void setPort(String port){
 		port_field.setText(port);
 	}
+	/**
+	 * Returns a port
+	 * @return port in String
+	 */
 	public static String getPort(){
 		return port_field.getText();
 	}
+	/**
+	 * Returns a username of the current user
+	 * @return current username
+	 */
 	public static String getUsername() {
 		return userNameInput.getText();
 	}
 
+	/**
+	 * Sets a new username
+	 * @param nickName The username of current client
+	 */
 	public void setUsernameInput(String nickName) {
 		userNameInput.setText(nickName);
 	}
 
+	/**
+	 * Returns the ip of the server
+	 * @return  String ip
+	 */
 	public static String getServerIP() {
 		return insertServerIP.getText();
 	}
 
+	/**
+	 * Returns the sending message
+	 * @return String message
+	 */
 	public static String getInputMessage() {
 		return inputMessage.getText();
 	}
 
+	/**
+	 * Setting an input message in specific text field
+	 * @param message message in String
+	 */
 	public static void setInputMessage(String message) {
 		inputMessage.setText(message);
 	}
 
-	public static void setOnlineUsers(String[] s) {
-		for (String W : s)
-			onlineUsers.append(W);
-	}
 
+	/**
+	 * Displaying all online users
+	 * @param result Message that client received from server after parsing
+	 */
+	
+	public static void setOnlineUsers(String []result) {
+		ClientGUI.chatArea.setText(null);
+		String[] users = result[0].split(",");
+		for (int i = 0; i < users.length; i++) {
+			if (users[i] == "")
+				;
+			else
+				ClientGUI.onlineUsers.append(users[i] + "\n");
+		}
+	}
+	
+	/**
+	 * Returns all online users
+	 * @return online users
+	 */
 	public String getOnlineUsers() {
 		return onlineUsers.getText();
 	}

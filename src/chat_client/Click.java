@@ -1,13 +1,18 @@
+
+package chat_client;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-
-/*
- * Client class
+/**
+ * The class represents  a listener for buttons<br>
+ * from client GUI. Connect between {@link Client} class and {@link ClientGUI} class
+ * @author Denis Ievlev
+ * @author Alexey Kurbatsky
  */
+
 public class Click implements ActionListener {
 	protected JButton _button;
 	protected JMenuItem _item;
@@ -18,7 +23,9 @@ public class Click implements ActionListener {
 		this._item = item;
 	}
 
-	
+	/**
+	 * All possible actions for buttons or menu items
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
