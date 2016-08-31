@@ -7,7 +7,6 @@ import java.net.*;
 import java.util.Scanner;
 import javax.swing.JOptionPane;
 
-
 /**
  * class Client represents all client functions
  * 
@@ -139,19 +138,24 @@ public class Client implements Runnable {
 	private void processMessage(String msg) {
 		String[] result = Protocol.parseMessage(msg);
 		switch (Protocol.getType(msg)) {
-		// private message from result[2]
+
+		// broadcast message from result[2]
 		case Protocol.broadcastMessage:
 			ClientGUI.chatArea.append("[public] " + result[1] + ": " + result[0] + "\n");
 			break;
-		// broadcast message
+
+		// private message
 		case Protocol.privateMessage:
 			ClientGUI.chatArea.append("[private] " + result[2] + ": " + result[0] + "\n");
 			break;
-		case Protocol.refreshOnlineUsers:
-			System.out.println("LOG: users online: " + msg);
-			refreshOnlineUsers(result);
 
+		case Protocol.refreshOnlineUsers:
+			System.out.println("LOG: users online (from server) " + msg);
+			ClientGUI.setOnlineUsers(result);
+			System.out.println("LOG: Users online: (client)\n " + ClientGUI.getOnlineUsers());
+			System.out.println("the users from thread " + Thread.currentThread());
 			break;
+
 		// server message
 		case Protocol.serverMessage:
 			JOptionPane.showMessageDialog(null, result[0]);
@@ -160,24 +164,6 @@ public class Client implements Runnable {
 			disconnect();
 			break;
 		}
-	}
-
-	/**
-	 * Refreshing the online users
-	 * 
-	 * @param result
-	 *            is parsed String from {@link Protocol #parseMessage(String)}
-	 */
-	private void refreshOnlineUsers(String[] result) {
-		ClientGUI.chatArea.setText(null);
-		String[] users = result[0].split(",");
-		for (int i = 0; i < users.length; i++) {
-			if (users[i] == "")
-				;
-			else
-				ClientGUI.onlineUsers.append(users[i] + "\n");
-		}
-
 	}
 
 	/**
@@ -227,8 +213,8 @@ public class Client implements Runnable {
 	}
 
 	/**
-	 * Disconnection from server and closing all open streams.
-	 * Send a disconnect message to server
+	 * Disconnection from server and closing all open streams. Send a disconnect
+	 * message to server
 	 */
 	public static void disconnect() {
 		if (socket != null) {
@@ -244,6 +230,7 @@ public class Client implements Runnable {
 
 			System.out.println("Disconnecting..");
 			ClientGUI.setOnlineUsers(new String[] { "" });
+			ClientGUI.chatArea.append("You are disconnected from chat");
 		}
 		try {
 			if (socket != null) {
@@ -258,9 +245,10 @@ public class Client implements Runnable {
 	}
 
 	/**
-	 * Main function of the client. 
-	 * Starts a new GUI
-	 * @param args no arguments from user needed
+	 * Main function of the client. Starts a new GUI
+	 * 
+	 * @param args
+	 *            no arguments from user needed
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {

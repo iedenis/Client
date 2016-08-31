@@ -1,5 +1,6 @@
 
 package chat_client;
+
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.GroupLayout;
@@ -13,6 +14,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+
 /**
  * @author Denis Ievlev
  * @author Alexey Kurbatsky
@@ -34,6 +36,13 @@ public class ClientGUI {
 	protected JMenuItem mntmExit;
 	protected static JTextArea chatArea;
 	protected static JTextArea onlineUsers;
+	protected JLabel lblPort;
+	protected JLabel lblChatBox;
+	protected JLabel lblCurrentlyOnline;
+	protected JLabel lblNewLabel;
+	protected JLabel lblUserName;
+	protected JMenuBar menuBar;
+	protected JMenu mnFile;
 
 	public ClientGUI() {
 		initialize();
@@ -44,9 +53,8 @@ public class ClientGUI {
 		frame.setBounds(200, 200, 500, 400);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("Client");
-		JLabel lblNewLabel = new JLabel("Server IP");
-
-		JLabel lblUserName = new JLabel("User name");
+		lblNewLabel = new JLabel("Server IP");
+		lblUserName = new JLabel("User name");
 
 		insertServerIP = new JTextField();
 		insertServerIP.setColumns(10);
@@ -54,13 +62,10 @@ public class ClientGUI {
 
 		userNameInput = new JTextField("");
 		userNameInput.setColumns(10);
-
-		JLabel lblPort = new JLabel("Port");
-
+		lblPort = new JLabel("Port");
 		port_field = new JTextField();
 		port_field.setColumns(10);
 		port_field.setText("55555");
-
 		btnSend = new JButton("Send");
 		btnSend.addActionListener(new Click(btnSend, null));
 
@@ -72,11 +77,23 @@ public class ClientGUI {
 
 		chatArea = new JTextArea();
 
-		JLabel lblChatBox = new JLabel("Chat box");
+		lblChatBox = new JLabel("Chat box");
 
-		JLabel lblCurrentlyOnline = new JLabel("Currently online");
+		lblCurrentlyOnline = new JLabel("Currently online");
 
 		onlineUsers = new JTextArea();
+		menuBar = new JMenuBar();
+		frame.setJMenuBar(menuBar);
+
+		mnFile = new JMenu("File");
+		menuBar.add(mnFile);
+
+		mntmExit = new JMenuItem("Exit");
+		mntmExit.addActionListener(new Click(null, mntmExit));
+
+		mnFile.add(mntmExit);
+		
+		//creating the view
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout
 				.createSequentialGroup().addContainerGap()
@@ -138,42 +155,31 @@ public class ClientGUI {
 						.addContainerGap(20, Short.MAX_VALUE)));
 		frame.getContentPane().setLayout(groupLayout);
 
-		frame.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent we) {
-				Client.disconnect();
-				System.exit(0);
-			}
-		});
-
-		JMenuBar menuBar = new JMenuBar();
-		frame.setJMenuBar(menuBar);
-
-		JMenu mnFile = new JMenu("File");
-		menuBar.add(mnFile);
-
-		mntmExit = new JMenuItem("Exit");
-		mntmExit.addActionListener(new Click(null, mntmExit));
-
-		mnFile.add(mntmExit);
+		frame.addWindowListener(new Click());
 	}
 
-	/** 
+	/**
 	 * Sets a new port that when we want to change
-	 * @param port a new port
+	 * 
+	 * @param port
+	 *            a new port
 	 */
-	public static void setPort(String port){
+	public static void setPort(String port) {
 		port_field.setText(port);
 	}
+
 	/**
 	 * Returns a port
+	 * 
 	 * @return port in String
 	 */
-	public static String getPort(){
+	public static String getPort() {
 		return port_field.getText();
 	}
+
 	/**
 	 * Returns a username of the current user
+	 * 
 	 * @return current username
 	 */
 	public static String getUsername() {
@@ -182,7 +188,9 @@ public class ClientGUI {
 
 	/**
 	 * Sets a new username
-	 * @param nickName The username of current client
+	 * 
+	 * @param nickName
+	 *            The username of current client
 	 */
 	public void setUsernameInput(String nickName) {
 		userNameInput.setText(nickName);
@@ -190,7 +198,8 @@ public class ClientGUI {
 
 	/**
 	 * Returns the ip of the server
-	 * @return  String ip
+	 * 
+	 * @return String ip
 	 */
 	public static String getServerIP() {
 		return insertServerIP.getText();
@@ -198,6 +207,7 @@ public class ClientGUI {
 
 	/**
 	 * Returns the sending message
+	 * 
 	 * @return String message
 	 */
 	public static String getInputMessage() {
@@ -206,20 +216,23 @@ public class ClientGUI {
 
 	/**
 	 * Setting an input message in specific text field
-	 * @param message message in String
+	 * 
+	 * @param message
+	 *            message in String
 	 */
 	public static void setInputMessage(String message) {
 		inputMessage.setText(message);
 	}
-
-
-	/**
-	 * Displaying all online users
-	 * @param result Message that client received from server after parsing
-	 */
 	
-	public static void setOnlineUsers(String []result) {
-		ClientGUI.chatArea.setText(null);
+	/**
+	 * Setting all online users
+	 * 
+	 * @param result
+	 *            Message that client received from server after parsing
+	 */
+
+	public static void setOnlineUsers(String[] result) {
+		ClientGUI.onlineUsers.setText(null);
 		String[] users = result[0].split(",");
 		for (int i = 0; i < users.length; i++) {
 			if (users[i] == "")
@@ -228,12 +241,12 @@ public class ClientGUI {
 				ClientGUI.onlineUsers.append(users[i] + "\n");
 		}
 	}
-	
 	/**
 	 * Returns all online users
+	 * 
 	 * @return online users
 	 */
-	public String getOnlineUsers() {
+	public static String getOnlineUsers() {
 		return onlineUsers.getText();
 	}
 }
