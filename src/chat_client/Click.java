@@ -9,6 +9,7 @@ import java.awt.event.WindowListener;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 /**
  * The class represents a listener for buttons<br>
@@ -23,6 +24,7 @@ public class Click implements ActionListener, WindowListener {
 	protected JButton _button;
 	protected JMenuItem _item;
 	public static String message;
+	private static JTextField _field;
 
 	public Click(JButton button, JMenuItem item) {
 		this._button = button;
@@ -32,12 +34,15 @@ public class Click implements ActionListener, WindowListener {
 	public Click() {
 	}
 
+	public Click(JTextField field) {
+		_field = field;
+	}
+
 	/**
 	 * All possible actions for buttons or menu items
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-
 		if (e.getActionCommand() == "Exit") {
 			Client.disconnect();
 			System.exit(0);
@@ -50,15 +55,14 @@ public class Click implements ActionListener, WindowListener {
 				JOptionPane.showMessageDialog(null, "You have to insert your username");
 			} else {
 				System.out.println("Starting new client");
-				_button.setText("Disconnect");
+				// _button.setText("Disconnect");
 			}
 		}
-
 		if (e.getActionCommand().equals("Disconnect")) {
 			Client.disconnect();
-			_button.setText("Connect");
+			ClientGUI.refreshButtonState("Connect");
 		}
-		if (e.getActionCommand().equals("Send")) {
+		if (e.getActionCommand().equals("Send") || e.getSource().equals(_field)) {
 			Client.sendMessage();
 		}
 	}

@@ -1,8 +1,8 @@
 
 package chat_client;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.Desktop.Action;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -14,6 +14,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.DefaultEditorKit.CopyAction;
+import javax.swing.text.DefaultEditorKit.CutAction;
+import javax.swing.text.DefaultEditorKit.PasteAction;
 
 /**
  * @author Denis Ievlev
@@ -31,7 +35,7 @@ public class ClientGUI {
 	private static JTextField userNameInput;
 	protected static JTextField port_field;
 	private static JTextField inputMessage;
-	protected JButton btnConnect;
+	protected static JButton btnConnect;
 	protected JButton btnSend;
 	protected JMenuItem mntmExit;
 	protected static JTextArea chatArea;
@@ -76,12 +80,14 @@ public class ClientGUI {
 		btnConnect.addActionListener(new Click(btnConnect, null));
 
 		chatArea = new JTextArea();
+		chatArea.setEditable(false);
 
 		lblChatBox = new JLabel("Chat box");
 
 		lblCurrentlyOnline = new JLabel("Currently online");
 
 		onlineUsers = new JTextArea();
+		onlineUsers.setEditable(false);
 		menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
 
@@ -90,10 +96,11 @@ public class ClientGUI {
 
 		mntmExit = new JMenuItem("Exit");
 		mntmExit.addActionListener(new Click(null, mntmExit));
+		inputMessage.addActionListener(new Click(inputMessage));
 
 		mnFile.add(mntmExit);
-		
-		//creating the view
+
+		// creating the view
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(Alignment.LEADING).addGroup(groupLayout
 				.createSequentialGroup().addContainerGap()
@@ -156,6 +163,14 @@ public class ClientGUI {
 		frame.getContentPane().setLayout(groupLayout);
 
 		frame.addWindowListener(new Click());
+	}
+
+	CopyAction copyAction = new DefaultEditorKit.CopyAction();
+	CutAction cutAction = new DefaultEditorKit.CutAction();
+	PasteAction pasteAction = new DefaultEditorKit.PasteAction();
+
+	public static void refreshButtonState(String text) {
+		btnConnect.setText(text);
 	}
 
 	/**
@@ -223,7 +238,7 @@ public class ClientGUI {
 	public static void setInputMessage(String message) {
 		inputMessage.setText(message);
 	}
-	
+
 	/**
 	 * Setting all online users
 	 * 
@@ -241,6 +256,7 @@ public class ClientGUI {
 				ClientGUI.onlineUsers.append(users[i] + "\n");
 		}
 	}
+
 	/**
 	 * Returns all online users
 	 * 

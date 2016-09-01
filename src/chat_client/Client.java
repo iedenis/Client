@@ -15,15 +15,15 @@ import javax.swing.JOptionPane;
  */
 
 public class Client implements Runnable {
-	int _port;
-	static Socket socket;
-	public static String message;
+	private int _port;
+	private static Socket socket;
+	protected static String message;
 	private static boolean running = true;
 	private static PrintStream printStream = null;
-	Scanner input;
-	static PrintStream output;
+	private Scanner input;
+	private static PrintStream output;
 	private static int counter;
-	// private PrintWriter writer;
+	protected static boolean isConnected = false;
 
 	/**
 	 * Constructor for Client
@@ -66,6 +66,7 @@ public class Client implements Runnable {
 		}
 		if (socket != null) {
 			System.out.println("Accepted socket from server");
+			ClientGUI.refreshButtonState("Disconnect");
 
 			try {
 				// int times = 5;
@@ -150,10 +151,7 @@ public class Client implements Runnable {
 			break;
 
 		case Protocol.refreshOnlineUsers:
-			System.out.println("LOG: users online (from server) " + msg);
 			ClientGUI.setOnlineUsers(result);
-			System.out.println("LOG: Users online: (client)\n " + ClientGUI.getOnlineUsers());
-			System.out.println("the users from thread " + Thread.currentThread());
 			break;
 
 		// server message
@@ -200,7 +198,6 @@ public class Client implements Runnable {
 				JOptionPane.showMessageDialog(null, "Please, write a message");
 		} else
 			JOptionPane.showMessageDialog(null, "You are disconnected");
-		// ClientGUI.chatArea.append("You are disconnected");
 	}
 
 	/**
@@ -217,27 +214,18 @@ public class Client implements Runnable {
 	 * message to server
 	 */
 	public static void disconnect() {
-		if (socket != null) {
-			running = false;
-			try {
-				printStream = new PrintStream(socket.getOutputStream());
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			printStream.println(Protocol.createMessage(Protocol.disconnectMessage, "", ""));
-			printStream.flush();
-			printStream.close();
-
-			System.out.println("Disconnecting..");
-			ClientGUI.setOnlineUsers(new String[] { "" });
-			ClientGUI.chatArea.append("You are disconnected from chat");
-		}
 		try {
 			if (socket != null) {
+				printStream.println(Protocol.createMessage(Protocol.disconnectMessage, "", ""));
+				printStream.flush();
+				printStream.close();
 				socket.close();
-				System.out.println("Disconnected successfully from chat");
+
+				ClientGUI.setOnlineUsers(new String[] { "" });
+				ClientGUI.chatArea.append("You are disconnected from chat");
+				running = false;
 			} else {
-				System.out.println("There is no socket");
+				ClientGUI.chatArea.append("You were not connected to chat");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
