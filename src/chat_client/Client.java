@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
  */
 
 public class Client implements Runnable {
+	volatile stop=false;
 	private int _port;
 	private static Socket socket;
 	protected static String message;
@@ -25,6 +26,7 @@ public class Client implements Runnable {
 	private static int counter;
 	protected static boolean isConnected = false;
 
+	
 	/**
 	 * Constructor for Client
 	 * 
@@ -35,86 +37,92 @@ public class Client implements Runnable {
 		this._port = port;
 		socket = null;
 	}
+	public void requestStop() {
+        stop = true;
+    }
 
 	public void run() {
-		while (running && socket == null && counter < 10) {
-			counter++;
-			System.out.println("Trying to connect to server..." + " time " + counter);
 
-			try {
-				socket = new Socket(ClientGUI.getServerIP(), this._port);
-				System.out.println("Client socket is: " + socket);
+			while (running && socket == null && counter < 10) {
+				counter++;
+				System.out.println("Trying to connect to server..." + " time " + counter);
 
-			} catch (UnknownHostException e) {
-				// e.printStackTrace();
 				try {
-					Thread.sleep(5000);
-					System.out.println("Waiting for server...");
-				} catch (InterruptedException e1) {
-					// e1.printStackTrace();
+					socket = new Socket(ClientGUI.getServerIP(), this._port);
+					System.out.println("Client socket is: " + socket);
+
+				} catch (UnknownHostException e) {
+					// e.printStackTrace();
+					try {
+						Thread.sleep(5000);
+						System.out.println("Waiting for server...");
+					} catch (InterruptedException e1) {
+						// e1.printStackTrace();
+					}
+				} catch (IOException e) {
+					// e.printStackTrace();
+					try {
+						Thread.sleep(5000);
+						ClientGUI.chatArea.append("Still waiting for server\n");
+					} catch (InterruptedException e1) {
+						// e1.printStackTrace();
+						running = false;
+					}
 				}
-			} catch (IOException e) {
-				// e.printStackTrace();
+			}
+			if (socket != null) {
+				System.out.println("Accepted socket from server");
+				ClientGUI.refreshButtonState("Disconnect");
+				
 				try {
-					Thread.sleep(5000);
-					ClientGUI.chatArea.append("Still waiting for server\n");
-				} catch (InterruptedException e1) {
-					// e1.printStackTrace();
-					running = false;
+					// int times = 5;
+					String servMessage = "";
+					String connectRequestMessage = "2" + ClientGUI.getUsername() + ":";
+					String[] res;
+
+					// sending request connection message to server
+
+					// TODO change while to function
+
+					printStream = new PrintStream(socket.getOutputStream());
+					// printStream.println(connectRequestMessage);
+					System.out.println("LOG: Connection request message is: " + connectRequestMessage);
+					printStream.println(connectRequestMessage);
+					printStream.flush();
+					input = new Scanner(socket.getInputStream());
+					servMessage = input.nextLine();
+
+					System.out.println("LOG: connection request message from server: " + servMessage);
+					res = new String[3];
+					res = Protocol.parseMessage(servMessage);
+					if (res[1].equals("fail"))
+						JOptionPane.showMessageDialog(null, "Choose another username");
+					System.out.println("LOG: The answer from server is " + res[1]);
+					// if the respond message from server
+					// times--;
+
+					if (Protocol.getType(servMessage) == 2 && res[1].equals("success")) {
+						ClientGUI.chatArea.append("You are connected to chat\n");
+						// check for input messages
+						checkStream();
+
+					} else if (res[2] == null || res[2] == "") {
+						System.out.println("haven't receive the answer from server");
+					} else
+						JOptionPane.showMessageDialog(null, res[2]);
+
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}
-		if (socket != null) {
-			System.out.println("Accepted socket from server");
-			ClientGUI.refreshButtonState("Disconnect");
-
-			try {
-				// int times = 5;
-				String servMessage = "";
-				String connectRequestMessage = "2" + ClientGUI.getUsername() + ":";
-				String[] res;
-				// sending request connection message to server
-
-				// TODO change while to function
-
-				printStream = new PrintStream(socket.getOutputStream());
-				// printStream.println(connectRequestMessage);
-				System.out.println("LOG: Connection request message is: " + connectRequestMessage);
-				printStream.println(connectRequestMessage);
-				printStream.flush();
-				input = new Scanner(socket.getInputStream());
-				servMessage = input.nextLine();
-
-				System.out.println("LOG: connection request message from server: " + servMessage);
-				res = new String[3];
-				res = Protocol.parseMessage(servMessage);
-				if (res[1].equals("fail"))
-					JOptionPane.showMessageDialog(null, "Choose another username");
-				System.out.println("LOG: The answer from server is " + res[1]);
-				// if the respond message from server
-				// times--;
-
-				if (Protocol.getType(servMessage) == 2 && res[1].equals("success")) {
-					ClientGUI.chatArea.append("You are connected to chat\n");
-					// check for input messages
-					checkStream();
-
-				} else if (res[2] == null || res[2] == "") {
-					System.out.println("haven't receive the answer from server");
-				} else
-					JOptionPane.showMessageDialog(null, res[2]);
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+	
 
 	/**
 	 * Checks the input stream
 	 */
 	private void checkStream() {
-		while (true)
+		while (running)
 			receive();
 	}
 
@@ -216,6 +224,7 @@ public class Client implements Runnable {
 	public static void disconnect() {
 		try {
 			if (socket != null) {
+				running = false;
 				printStream.println(Protocol.createMessage(Protocol.disconnectMessage, "", ""));
 				printStream.flush();
 				printStream.close();
@@ -223,7 +232,6 @@ public class Client implements Runnable {
 
 				ClientGUI.setOnlineUsers(new String[] { "" });
 				ClientGUI.chatArea.append("You are disconnected from chat");
-				running = false;
 			} else {
 				ClientGUI.chatArea.append("You were not connected to chat");
 			}
