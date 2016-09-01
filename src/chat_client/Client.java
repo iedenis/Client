@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
  */
 
 public class Client implements Runnable {
-	volatile stop=false;
+	//volatile stop=false;
 	private int _port;
 	private static Socket socket;
 	protected static String message;
@@ -37,9 +37,10 @@ public class Client implements Runnable {
 		this._port = port;
 		socket = null;
 	}
-	public void requestStop() {
-        stop = true;
-    }
+	
+	//public void requestStop() {
+      //  stop = true;
+    //}
 
 	public void run() {
 
