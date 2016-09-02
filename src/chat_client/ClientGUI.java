@@ -1,7 +1,7 @@
 
 package chat_client;
 
-import java.awt.Desktop.Action;
+import java.awt.ScrollPane;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -87,7 +88,8 @@ public class ClientGUI {
 		lblCurrentlyOnline = new JLabel("Currently online");
 
 		onlineUsers = new JTextArea();
-		onlineUsers.setEditable(false);
+		//onlineUsers.setEditable(false);
+		//JScrollPane scroll=new JScrollPane(onlineUsers);
 		menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
 
@@ -161,7 +163,6 @@ public class ClientGUI {
 								.addComponent(btnSend))
 						.addContainerGap(20, Short.MAX_VALUE)));
 		frame.getContentPane().setLayout(groupLayout);
-
 		frame.addWindowListener(new Click());
 	}
 

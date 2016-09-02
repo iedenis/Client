@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -49,18 +48,21 @@ public class Click implements ActionListener, WindowListener {
 		}
 
 		if (e.getActionCommand().equals("Connect")) {
-			Client.connect();
+
 			System.out.println("Username is:" + ClientGUI.getUsername());
 			if (ClientGUI.getUsername().equals("")) {
 				JOptionPane.showMessageDialog(null, "You have to insert your username");
 			} else {
-				System.out.println("Starting new client");
-				// _button.setText("Disconnect");
+				Client.connect();
+				if (Client.isConnected)
+					ClientGUI.refreshButtonState("Disconnect");
 			}
 		}
 		if (e.getActionCommand().equals("Disconnect")) {
 			Client.disconnect();
-			ClientGUI.refreshButtonState("Connect");
+			if (!Client.isConnected) {
+				ClientGUI.refreshButtonState("Connect");
+			}
 		}
 		if (e.getActionCommand().equals("Send") || e.getSource().equals(_field)) {
 			Client.sendMessage();

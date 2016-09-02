@@ -12,10 +12,10 @@ import javax.swing.JOptionPane;
  * 
  * @author Denis Ievlev
  * @author Alexey Kurbatsky
+ * 
  */
 
 public class Client implements Runnable {
-	//volatile stop=false;
 	private int _port;
 	private static Socket socket;
 	protected static String message;
@@ -25,8 +25,8 @@ public class Client implements Runnable {
 	private static PrintStream output;
 	private static int counter;
 	protected static boolean isConnected = false;
+	String userName=ClientGUI.getUsername();
 
-	
 	/**
 	 * Constructor for Client
 	 * 
@@ -37,14 +37,10 @@ public class Client implements Runnable {
 		this._port = port;
 		socket = null;
 	}
-	
-	//public void requestStop() {
-      //  stop = true;
-    //}
 
 	public void run() {
-
-			while (running && socket == null && counter < 10) {
+		while (running) {
+			while (socket == null && counter < 10) {
 				counter++;
 				System.out.println("Trying to connect to server..." + " time " + counter);
 
@@ -73,17 +69,12 @@ public class Client implements Runnable {
 			}
 			if (socket != null) {
 				System.out.println("Accepted socket from server");
-				ClientGUI.refreshButtonState("Disconnect");
-				
 				try {
-					// int times = 5;
 					String servMessage = "";
-					String connectRequestMessage = "2" + ClientGUI.getUsername() + ":";
+					String connectRequestMessage = "2" + userName + ":";
 					String[] res;
 
 					// sending request connection message to server
-
-					// TODO change while to function
 
 					printStream = new PrintStream(socket.getOutputStream());
 					// printStream.println(connectRequestMessage);
@@ -96,17 +87,22 @@ public class Client implements Runnable {
 					System.out.println("LOG: connection request message from server: " + servMessage);
 					res = new String[3];
 					res = Protocol.parseMessage(servMessage);
-					if (res[1].equals("fail"))
-						JOptionPane.showMessageDialog(null, "Choose another username");
+					
+					if (res[1].equals("fail")){
+						userName = JOptionPane.showInputDialog(null, "Please insert another username",
+					            "Input Dialog", JOptionPane.PLAIN_MESSAGE);
+
+						//JOptionPane.showMessageDialog(null, "Choose another username");
+						
+					}
 					System.out.println("LOG: The answer from server is " + res[1]);
-					// if the respond message from server
-					// times--;
-
 					if (Protocol.getType(servMessage) == 2 && res[1].equals("success")) {
+						isConnected = true;
 						ClientGUI.chatArea.append("You are connected to chat\n");
-						// check for input messages
-						checkStream();
-
+						ClientGUI.refreshButtonState("Disconnect");
+						
+						checkStream(); // check for input messages
+						
 					} else if (res[2] == null || res[2] == "") {
 						System.out.println("haven't receive the answer from server");
 					} else
@@ -117,14 +113,15 @@ public class Client implements Runnable {
 				}
 			}
 		}
-	
+	}
 
 	/**
 	 * Checks the input stream
 	 */
 	private void checkStream() {
-		while (running)
+		while (running) {
 			receive();
+		}
 	}
 
 	/**
@@ -178,7 +175,7 @@ public class Client implements Runnable {
 	 * {@link Protocol #createMessage(int, String, String)}
 	 */
 	public static void sendMessage() {
-
+		if(isConnected){
 		if (socket != null) {
 			if (!ClientGUI.getInputMessage().equals("")) {
 				try {
@@ -208,14 +205,18 @@ public class Client implements Runnable {
 		} else
 			JOptionPane.showMessageDialog(null, "You are disconnected");
 	}
-
+		else
+			JOptionPane.showMessageDialog(null, "You can't send messages when you are offline\nPlease connect to the chat");
+	}
 	/**
 	 * Making a new client when connect button is pressed
 	 */
 	public static void connect() {
+		System.out.println("Starting new client");
+		running=true;
 		Client client = new Client(Integer.parseInt(ClientGUI.getPort()));
-		Thread th = new Thread(client);
-		th.start();
+		Thread clientThread = new Thread(client);
+		clientThread.start();
 	}
 
 	/**
@@ -230,9 +231,9 @@ public class Client implements Runnable {
 				printStream.flush();
 				printStream.close();
 				socket.close();
-
 				ClientGUI.setOnlineUsers(new String[] { "" });
 				ClientGUI.chatArea.append("You are disconnected from chat");
+				isConnected = false;
 			} else {
 				ClientGUI.chatArea.append("You were not connected to chat");
 			}
