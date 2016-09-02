@@ -23,7 +23,7 @@ public class Click implements ActionListener, WindowListener {
 	protected JButton _button;
 	protected JMenuItem _item;
 	public static String message;
-	private static JTextField _field;
+	private  JTextField _field;
 
 	public Click(JButton button, JMenuItem item) {
 		this._button = button;
@@ -32,7 +32,7 @@ public class Click implements ActionListener, WindowListener {
 
 	public Click() {
 	}
-
+	
 	public Click(JTextField field) {
 		_field = field;
 	}
@@ -48,8 +48,6 @@ public class Click implements ActionListener, WindowListener {
 		}
 
 		if (e.getActionCommand().equals("Connect")) {
-
-			System.out.println("Username is:" + ClientGUI.getUsername());
 			if (ClientGUI.getUsername().equals("")) {
 				JOptionPane.showMessageDialog(null, "You have to insert your username");
 			} else {

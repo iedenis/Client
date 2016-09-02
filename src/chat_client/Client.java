@@ -25,7 +25,7 @@ public class Client implements Runnable {
 	private static PrintStream output;
 	private static int counter;
 	protected static boolean isConnected = false;
-	String userName=ClientGUI.getUsername();
+	String userName = ClientGUI.getUsername();
 
 	/**
 	 * Constructor for Client
@@ -42,17 +42,16 @@ public class Client implements Runnable {
 		while (running) {
 			while (socket == null && counter < 10) {
 				counter++;
-				System.out.println("Trying to connect to server..." + " time " + counter);
+				ClientGUI.chatArea.append("Trying to connect to server..." + " time " + counter);
 
 				try {
 					socket = new Socket(ClientGUI.getServerIP(), this._port);
-					System.out.println("Client socket is: " + socket);
 
 				} catch (UnknownHostException e) {
 					// e.printStackTrace();
 					try {
 						Thread.sleep(5000);
-						System.out.println("Waiting for server...");
+						ClientGUI.chatArea.append("Waiting for server...\n");
 					} catch (InterruptedException e1) {
 						// e1.printStackTrace();
 					}
@@ -68,7 +67,6 @@ public class Client implements Runnable {
 				}
 			}
 			if (socket != null) {
-				System.out.println("Accepted socket from server");
 				try {
 					String servMessage = "";
 					String connectRequestMessage = "2" + userName + ":";
@@ -77,34 +75,28 @@ public class Client implements Runnable {
 					// sending request connection message to server
 
 					printStream = new PrintStream(socket.getOutputStream());
-					// printStream.println(connectRequestMessage);
-					System.out.println("LOG: Connection request message is: " + connectRequestMessage);
 					printStream.println(connectRequestMessage);
 					printStream.flush();
 					input = new Scanner(socket.getInputStream());
 					servMessage = input.nextLine();
 
-					System.out.println("LOG: connection request message from server: " + servMessage);
 					res = new String[3];
 					res = Protocol.parseMessage(servMessage);
-					
-					if (res[1].equals("fail")){
-						userName = JOptionPane.showInputDialog(null, "Please insert another username",
-					            "Input Dialog", JOptionPane.PLAIN_MESSAGE);
 
-						//JOptionPane.showMessageDialog(null, "Choose another username");
-						
+					if (res[1].equals("fail")) {
+						userName = JOptionPane.showInputDialog(null, "Please choose another username", "Input Dialog",
+								JOptionPane.PLAIN_MESSAGE);
 					}
-					System.out.println("LOG: The answer from server is " + res[1]);
+
 					if (Protocol.getType(servMessage) == 2 && res[1].equals("success")) {
 						isConnected = true;
-						ClientGUI.chatArea.append("You are connected to chat\n");
+						ClientGUI.chatArea.setText("You are connected to chat\n");
 						ClientGUI.refreshButtonState("Disconnect");
-						
+
 						checkStream(); // check for input messages
-						
-					} else if (res[2] == null || res[2] == "") {
-						System.out.println("haven't receive the answer from server");
+
+					} else if (res[2] == null || res[2].equals("")) {
+						ClientGUI.chatArea.append("Haven't received any answer from server\n");
 					} else
 						JOptionPane.showMessageDialog(null, res[2]);
 
@@ -175,45 +167,45 @@ public class Client implements Runnable {
 	 * {@link Protocol #createMessage(int, String, String)}
 	 */
 	public static void sendMessage() {
-		if(isConnected){
-		if (socket != null) {
-			if (!ClientGUI.getInputMessage().equals("")) {
-				try {
-					message = ClientGUI.getInputMessage();
-					char firstChar = message.charAt(0);
-					String from = "@" + ClientGUI.getUsername();
-					String newMessage = "";
-					if (firstChar == '@') {
-						newMessage = Protocol.createMessage(1, from, message);
-					} else {
-						newMessage = Protocol.createMessage(0, from, message);
+		if (isConnected) {
+			if (socket != null) {
+				if (!ClientGUI.getInputMessage().equals("")) {
+					try {
+						message = ClientGUI.getInputMessage();
+						char firstChar = message.charAt(0);
+						String from = "@" + ClientGUI.getUsername();
+						String newMessage = "";
+						if (firstChar == '@') {
+							newMessage = Protocol.createMessage(1, from, message);
+						} else {
+							newMessage = Protocol.createMessage(0, from, message);
+						}
+						output = new PrintStream(socket.getOutputStream());
+						output.println(newMessage);
+						output.flush();
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
-					output = new PrintStream(socket.getOutputStream());
-					output.println(newMessage);
+
+					ClientGUI.chatArea.append(ClientGUI.getUsername() + " : " + ClientGUI.getInputMessage() + "\n");
+					ClientGUI.setInputMessage("");
 					output.flush();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+					// output.close();
 
-				ClientGUI.chatArea.append(ClientGUI.getUsername() + " : " + ClientGUI.getInputMessage() + "\n");
-				ClientGUI.setInputMessage("");
-				output.flush();
-				// output.close();
-
+				} else
+					JOptionPane.showMessageDialog(null, "Please, write a message");
 			} else
-				JOptionPane.showMessageDialog(null, "Please, write a message");
+				JOptionPane.showMessageDialog(null, "You are disconnected");
 		} else
-			JOptionPane.showMessageDialog(null, "You are disconnected");
+			JOptionPane.showMessageDialog(null,
+					"You can't send messages when you are offline\nPlease connect to the chat");
 	}
-		else
-			JOptionPane.showMessageDialog(null, "You can't send messages when you are offline\nPlease connect to the chat");
-	}
+
 	/**
 	 * Making a new client when connect button is pressed
 	 */
 	public static void connect() {
-		System.out.println("Starting new client");
-		running=true;
+		running = true;
 		Client client = new Client(Integer.parseInt(ClientGUI.getPort()));
 		Thread clientThread = new Thread(client);
 		clientThread.start();
@@ -251,7 +243,6 @@ public class Client implements Runnable {
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				System.out.println("Started thread " + Thread.currentThread());
 				try {
 					ClientGUI window = new ClientGUI();
 					window.frame.setVisible(true);
