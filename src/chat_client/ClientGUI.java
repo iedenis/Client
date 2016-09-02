@@ -88,8 +88,7 @@ public class ClientGUI {
 		lblCurrentlyOnline = new JLabel("Currently online");
 
 		onlineUsers = new JTextArea();
-		//onlineUsers.setEditable(false);
-		//JScrollPane scroll=new JScrollPane(onlineUsers);
+		onlineUsers.setEditable(false);
 		menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
 
