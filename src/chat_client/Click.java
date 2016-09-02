@@ -23,16 +23,26 @@ public class Click implements ActionListener, WindowListener {
 	protected JButton _button;
 	protected JMenuItem _item;
 	public static String message;
-	private  JTextField _field;
+	private JTextField _field;
 
 	public Click(JButton button, JMenuItem item) {
 		this._button = button;
 		this._item = item;
 	}
 
+	/**
+	 * default constructor for window listener.
+	 */
 	public Click() {
 	}
-	
+
+	/**
+	 * Creates an object for for listener to send message by striking "Enter"
+	 * key
+	 * 
+	 * @param field
+	 *            - JTexfield
+	 */
 	public Click(JTextField field) {
 		_field = field;
 	}
@@ -67,6 +77,8 @@ public class Click implements ActionListener, WindowListener {
 		}
 	}
 
+	
+	
 	@Override
 	public void windowClosing(WindowEvent e) {
 		Client.disconnect();

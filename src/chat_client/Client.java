@@ -8,7 +8,8 @@ import java.util.Scanner;
 import javax.swing.JOptionPane;
 
 /**
- * class Client represents all client functions
+ * Class Client represents all client functions<br>
+ * This is the main class for the client
  * 
  * @author Denis Ievlev
  * @author Alexey Kurbatsky
