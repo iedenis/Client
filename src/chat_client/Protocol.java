@@ -101,7 +101,7 @@ public class Protocol {
 			//res[0]=message.substring(1);
 			return res;
 		case serverMessage:
-			res[0] = message.substring(1);
+			res[0] = message.substring(2);
 			return res;
 		default:
 			res[0] = "error";

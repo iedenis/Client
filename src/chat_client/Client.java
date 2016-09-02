@@ -176,9 +176,11 @@ public class Client implements Runnable {
 						String from = "@" + ClientGUI.getUsername();
 						String newMessage = "";
 						if (firstChar == '@') {
-							newMessage = Protocol.createMessage(1, from, message);
+							newMessage = Protocol.createMessage(Protocol.privateMessage, from, message);
+							ClientGUI.chatArea.append("[private] " + message + "\n");
 						} else {
-							newMessage = Protocol.createMessage(0, from, message);
+							newMessage = Protocol.createMessage(Protocol.broadcastMessage, from, message);
+							ClientGUI.chatArea.append("[public] " + message + "\n");
 						}
 						output = new PrintStream(socket.getOutputStream());
 						output.println(newMessage);
@@ -187,11 +189,8 @@ public class Client implements Runnable {
 						e.printStackTrace();
 					}
 
-					ClientGUI.chatArea.append(ClientGUI.getUsername() + " : " + ClientGUI.getInputMessage() + "\n");
 					ClientGUI.setInputMessage("");
 					output.flush();
-					// output.close();
-
 				} else
 					JOptionPane.showMessageDialog(null, "Please, write a message");
 			} else
