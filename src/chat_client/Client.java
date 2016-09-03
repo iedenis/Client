@@ -43,7 +43,7 @@ public class Client implements Runnable {
 		while (running) {
 			while (socket == null && counter < 10) {
 				counter++;
-				ClientGUI.chatArea.append("Trying to connect to server..." + " time " + counter);
+				appendTextToChatArea("Trying to connect to server..." + " time " + counter);
 
 				try {
 					socket = new Socket(ClientGUI.getServerIP(), this._port);
@@ -52,7 +52,7 @@ public class Client implements Runnable {
 					// e.printStackTrace();
 					try {
 						Thread.sleep(5000);
-						ClientGUI.chatArea.append("Waiting for server...\n");
+						appendTextToChatArea("Waiting for server...\n");
 					} catch (InterruptedException e1) {
 						// e1.printStackTrace();
 					}
@@ -60,7 +60,7 @@ public class Client implements Runnable {
 					// e.printStackTrace();
 					try {
 						Thread.sleep(5000);
-						ClientGUI.chatArea.append("Still waiting for server\n");
+						appendTextToChatArea("Still waiting for server\n");
 					} catch (InterruptedException e1) {
 						// e1.printStackTrace();
 						running = false;
@@ -141,12 +141,12 @@ public class Client implements Runnable {
 
 		// broadcast message from result[2]
 		case Protocol.broadcastMessage:
-			ClientGUI.chatArea.append("[public] " + result[1] + ": " + result[0] + "\n");
+			appendTextToChatArea("[public] " + result[1] + ": " + result[0] + "\n");
 			break;
 
 		// private message
 		case Protocol.privateMessage:
-			ClientGUI.chatArea.append("[private] " + result[2] + ": " + result[0] + "\n");
+			appendTextToChatArea("[private] " + result[1] + ": " + result[0] + "\n");
 			break;
 
 		case Protocol.refreshOnlineUsers:
@@ -165,7 +165,7 @@ public class Client implements Runnable {
 
 	/**
 	 * Sends a String message when button pressed Creates a message with
-	 * {@link Protocol #createMessage(int, String, String)}
+	 * {@link Protocol#createMessage(int, String, String)}
 	 */
 	public static void sendMessage() {
 		if (isConnected) {
@@ -178,10 +178,10 @@ public class Client implements Runnable {
 						String newMessage = "";
 						if (firstChar == '@') {
 							newMessage = Protocol.createMessage(Protocol.privateMessage, from, message);
-							ClientGUI.chatArea.append("[private] " + message + "\n");
+							appendTextToChatArea("[private] " + message + "\n");
 						} else {
 							newMessage = Protocol.createMessage(Protocol.broadcastMessage, from, message);
-							ClientGUI.chatArea.append("[public] " + message + "\n");
+							appendTextToChatArea("[public] " + message + "\n");
 						}
 						output = new PrintStream(socket.getOutputStream());
 						output.println(newMessage);
@@ -224,14 +224,24 @@ public class Client implements Runnable {
 				printStream.close();
 				socket.close();
 				ClientGUI.setOnlineUsers(new String[] { "" });
-				ClientGUI.chatArea.append("You are disconnected from chat");
+				appendTextToChatArea("You are disconnected from chat");
 				isConnected = false;
 			} else {
-				ClientGUI.chatArea.append("You were not connected to chat");
+				appendTextToChatArea("You were not connected to chat");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Appending the needed text to the chat window
+	 * 
+	 * @param text
+	 *            - text to append
+	 */
+	public static void appendTextToChatArea(String text) {
+		ClientGUI.chatArea.append(text);
 	}
 
 	/**

@@ -85,6 +85,7 @@ public class Click implements ActionListener, WindowListener {
 		System.exit(0);
 	}
 
+
 	@Override
 	public void windowOpened(WindowEvent e) {
 	}

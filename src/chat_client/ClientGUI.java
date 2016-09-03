@@ -45,10 +45,18 @@ public class ClientGUI {
 	protected JMenuBar menuBar;
 	protected JMenu mnFile;
 
+	/**
+	 * Constructor for the client's GUI<br>
+	 * Just calls the method {@link #initialize()}
+	 */
 	public ClientGUI() {
 		initialize();
 	}
 
+	/**
+	 * Creates the client's GUI.
+	 * Adding all GUI elements to the frame and setting the position
+	 */
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(200, 200, 500, 400);
