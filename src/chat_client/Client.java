@@ -177,8 +177,13 @@ public class Client implements Runnable {
 						String from = "@" + ClientGUI.getUsername();
 						String newMessage = "";
 						if (firstChar == '@') {
+							if(message.indexOf(':')<0){
+								JOptionPane.showMessageDialog(null,"Wrong message format\n Use ':' after nickname");
+							}
+							else{
 							newMessage = Protocol.createMessage(Protocol.privateMessage, from, message);
 							appendTextToChatArea("[private] " + message + "\n");
+							}
 						} else {
 							newMessage = Protocol.createMessage(Protocol.broadcastMessage, from, message);
 							appendTextToChatArea("[public] " + message + "\n");
