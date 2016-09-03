@@ -44,7 +44,7 @@ public class Client implements Runnable {
 			while (socket == null && counter < 10 && running) {
 				ClientGUI.refreshButtonState("Stop");
 				counter++;
-				appendTextToChatArea("Trying to connect to server..." + " time " + counter+"\n");
+				appendTextToChatArea("Trying to connect to server..." + " time " + counter + "\n");
 
 				try {
 					socket = new Socket(ClientGUI.getServerIP(), this._port);
@@ -61,7 +61,7 @@ public class Client implements Runnable {
 					// e.printStackTrace();
 					try {
 						Thread.sleep(5000);
-						//appendTextToChatArea("Still waiting for server\n");
+						// appendTextToChatArea("Still waiting for server\n");
 					} catch (InterruptedException e1) {
 						// e1.printStackTrace();
 						running = false;
@@ -159,7 +159,7 @@ public class Client implements Runnable {
 			JOptionPane.showMessageDialog(null, result[0]);
 			break;
 		case Protocol.disconnectMessage:
-			disconnect();
+			disconnect(true);
 			break;
 		}
 	}
@@ -219,12 +219,15 @@ public class Client implements Runnable {
 	/**
 	 * Disconnection from server and closing all open streams. Send a disconnect
 	 * message to server
+	 * @param disconnectingMessage if got disconnected message so it prevents to send more unneeded message to server
 	 */
-	public static void disconnect() {
+	public static void disconnect(boolean disconnectingMessage) {
 		try {
 			if (socket != null) {
 				running = false;
-				printStream.println(Protocol.createMessage(Protocol.disconnectMessage, "", ""));
+				if (!disconnectingMessage) {
+					printStream.println(Protocol.createMessage(Protocol.disconnectMessage, "", ""));
+				}
 				printStream.flush();
 				printStream.close();
 				socket.close();

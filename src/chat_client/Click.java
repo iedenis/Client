@@ -53,7 +53,7 @@ public class Click implements ActionListener, WindowListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand() == "Exit") {
-			Client.disconnect();
+			Client.disconnect(false);
 			System.exit(0);
 		}
 
@@ -67,7 +67,7 @@ public class Click implements ActionListener, WindowListener {
 			}
 		}
 		if (e.getActionCommand().equals("Disconnect")) {
-			Client.disconnect();
+			Client.disconnect(false);
 			if (!Client.isConnected) {
 				ClientGUI.refreshButtonState("Connect");
 			}
@@ -84,7 +84,7 @@ public class Click implements ActionListener, WindowListener {
 	
 	@Override
 	public void windowClosing(WindowEvent e) {
-		Client.disconnect();
+		Client.disconnect(false);
 		System.exit(0);
 	}
 
