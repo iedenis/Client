@@ -177,20 +177,21 @@ public class Client implements Runnable {
 						char firstChar = message.charAt(0);
 						String from = "@" + ClientGUI.getUsername();
 						String newMessage = "";
+						output = new PrintStream(socket.getOutputStream());
 						if (firstChar == '@') {
 							if (message.indexOf(':') < 0) {
 								JOptionPane.showMessageDialog(null, "Wrong message format\n Use ':' after nickname");
 							} else {
 								newMessage = Protocol.createMessage(Protocol.privateMessage, from, message);
 								appendTextToChatArea("[private] " + message + "\n");
+								output.println(newMessage);
 							}
 						} else {
 							newMessage = Protocol.createMessage(Protocol.broadcastMessage, from, message);
 							appendTextToChatArea("[public] " + message + "\n");
+							output.println(newMessage);
 						}
-						output = new PrintStream(socket.getOutputStream());
-						output.println(newMessage);
-						output.flush();
+						//output.flush();
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -232,7 +233,7 @@ public class Client implements Runnable {
 				printStream.close();
 				socket.close();
 				ClientGUI.setOnlineUsers(new String[] { "" });
-				appendTextToChatArea("You are disconnected from chat");
+				appendTextToChatArea("You are disconnected from chat\n");
 				isConnected = false;
 				ClientGUI.refreshButtonState("Connect");
 			} else {
