@@ -72,6 +72,9 @@ public class Click implements ActionListener, WindowListener {
 				ClientGUI.refreshButtonState("Connect");
 			}
 		}
+		if(e.getActionCommand().equals("Stop")){
+			Client.stop();
+		}
 		if (e.getActionCommand().equals("Send") || e.getSource().equals(_field)) {
 			Client.sendMessage();
 		}

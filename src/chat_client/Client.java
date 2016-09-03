@@ -41,9 +41,10 @@ public class Client implements Runnable {
 
 	public void run() {
 		while (running) {
-			while (socket == null && counter < 10) {
+			while (socket == null && counter < 10 && running) {
+				ClientGUI.refreshButtonState("Stop");
 				counter++;
-				appendTextToChatArea("Trying to connect to server..." + " time " + counter);
+				appendTextToChatArea("Trying to connect to server..." + " time " + counter+"\n");
 
 				try {
 					socket = new Socket(ClientGUI.getServerIP(), this._port);
@@ -60,7 +61,7 @@ public class Client implements Runnable {
 					// e.printStackTrace();
 					try {
 						Thread.sleep(5000);
-						appendTextToChatArea("Still waiting for server\n");
+						//appendTextToChatArea("Still waiting for server\n");
 					} catch (InterruptedException e1) {
 						// e1.printStackTrace();
 						running = false;
@@ -177,12 +178,11 @@ public class Client implements Runnable {
 						String from = "@" + ClientGUI.getUsername();
 						String newMessage = "";
 						if (firstChar == '@') {
-							if(message.indexOf(':')<0){
-								JOptionPane.showMessageDialog(null,"Wrong message format\n Use ':' after nickname");
-							}
-							else{
-							newMessage = Protocol.createMessage(Protocol.privateMessage, from, message);
-							appendTextToChatArea("[private] " + message + "\n");
+							if (message.indexOf(':') < 0) {
+								JOptionPane.showMessageDialog(null, "Wrong message format\n Use ':' after nickname");
+							} else {
+								newMessage = Protocol.createMessage(Protocol.privateMessage, from, message);
+								appendTextToChatArea("[private] " + message + "\n");
 							}
 						} else {
 							newMessage = Protocol.createMessage(Protocol.broadcastMessage, from, message);
@@ -231,12 +231,19 @@ public class Client implements Runnable {
 				ClientGUI.setOnlineUsers(new String[] { "" });
 				appendTextToChatArea("You are disconnected from chat");
 				isConnected = false;
+				ClientGUI.refreshButtonState("Connect");
 			} else {
-				appendTextToChatArea("You were not connected to chat");
+				appendTextToChatArea("You were not connected to chat\n");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static void stop() {
+		running = false;
+		appendTextToChatArea("Stopped\n");
+		ClientGUI.refreshButtonState("Connect");
 	}
 
 	/**
