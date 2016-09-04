@@ -92,6 +92,7 @@ public class Client implements Runnable {
 
 					if (Protocol.getType(servMessage) == 2 && res[1].equals("success")) {
 						isConnected = true;
+						counter=0;
 						ClientGUI.chatArea.setText("You are connected to chat\n");
 						ClientGUI.refreshButtonState("Disconnect");
 
