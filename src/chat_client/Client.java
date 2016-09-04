@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.*;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import javax.swing.JOptionPane;
 
@@ -122,10 +123,13 @@ public class Client implements Runnable {
 	 * receives line by line input messages
 	 */
 	private void receive() {
-		if (input.hasNext()) {
-			String message = input.nextLine();
-			processMessage(message);
-		}
+        try {
+            String message = input.nextLine();
+            processMessage(message);
+        }
+        catch (NoSuchElementException e) {
+            disconnect(false);
+        }
 	}
 
 	/**
