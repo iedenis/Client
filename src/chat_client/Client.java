@@ -122,7 +122,7 @@ public class Client implements Runnable {
 
 	/**
 	 * receives line by line input messages
-	 */
+	 */ 
 	private void receive() {
         try {
             String message = input.nextLine();
